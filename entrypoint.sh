@@ -39,5 +39,4 @@ else
     echo "deployed cnc with new tag"
 fi
 
-
 nomad job run "$GITHUB_WORKSPACE/$NOMAD_JOB"
