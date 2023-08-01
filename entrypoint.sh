@@ -26,16 +26,4 @@ sudo apt-get update && sudo apt-get install nomad
 sudo apt-get install jq
 sed -i "s/\[\[\.version\]\]/$DOCKER_TAG/" "$GITHUB_WORKSPACE/$NOMAD_JOB"
 sudo head -1 "$GITHUB_WORKSPACE/$NOMAD_JOB" | grep job | cut -d ' ' -f 2
-DONT_DEPLOY_CNC="${DONT_DEPLOY_CNC:-false}"
-if [ "$DONT_DEPLOY_CNC" = "true" ]; then
-    CNC_LATEST_IMAGE=$(nomad job inspect $JOB_NAME | jq '.[].TaskGroups[].Tasks[].Config.image' | grep cnc | rev | cut -d ':' -f 1 | rev | cut -d '"' -f 1)
-    sed -i "s/\[\[\.version-cnc\]\]/$CNC_LATEST_IMAGE/" "$GITHUB_WORKSPACE/$NOMAD_JOB"
-    echo "deployed cnc with same tag as existing"
-    echo $CNC_LATEST_IMAGE
-else
-    sed -i "s/\[\[\.version-cnc\]\]/$DOCKER_TAG/" "$GITHUB_WORKSPACE/$NOMAD_JOB"
-    echo "deployed cnc with new tag"
-fi
-
-
 nomad job run "$GITHUB_WORKSPACE/$NOMAD_JOB"
